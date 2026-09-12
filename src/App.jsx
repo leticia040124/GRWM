@@ -12,10 +12,15 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
+
         <Route path="/login" element={<Login />} />
+
         <Route path="/cadastro" element={<Cadastro />} />
+
         <Route path="/closet" element={<GuardaRoupa />} />
+
         <Route path="/looks" element={<Looks />} />
+
         <Route path="/perfil" element={<Perfil />} />
       </Routes>
     </BrowserRouter>
