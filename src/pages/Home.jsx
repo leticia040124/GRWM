@@ -231,18 +231,16 @@ function Home() {
             </p>
 
             <Link
-              to="/looks"
-              className="home-primary-button"
-            >
+  to="/montar-look"
+  className="home-primary-button"
+>
+  Montar meu look
 
-              Criar um look
-
-              <ArrowRight
-                size={15}
-                strokeWidth={1.6}
-              />
-
-            </Link>
+  <ArrowRight
+    size={15}
+    strokeWidth={1.6}
+  />
+</Link>
 
           </div>
 
@@ -291,26 +289,26 @@ function Home() {
 
 
             <Link
-              to="/looks"
-              className="home-shortcut"
-            >
+  to="/montar-look"
+  className="home-shortcut"
+>
 
-              <Sparkles
-                size={21}
-                strokeWidth={1.5}
-              />
+  <Sparkles
+    size={21}
+    strokeWidth={1.5}
+  />
 
-              <div>
-                <span>Looks</span>
-                <small>Suas combinações</small>
-              </div>
+  <div>
+    <span>Montar meu look</span>
+    <small>Crie uma combinação</small>
+  </div>
 
-              <ArrowRight
-                size={14}
-                strokeWidth={1.5}
-              />
+  <ArrowRight
+    size={14}
+    strokeWidth={1.5}
+  />
 
-            </Link>
+</Link>
 
 
             <Link

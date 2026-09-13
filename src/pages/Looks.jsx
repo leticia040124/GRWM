@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Home as HomeIcon,
   Shirt,
@@ -15,6 +15,7 @@ import {
   X,
   Check,
 } from "lucide-react";
+
 
 const looksIniciais = [
   {
@@ -59,6 +60,7 @@ const categorias = ["Todos", "Favoritos", "Recentes", "Casual", "Noite", "Evento
 
 function Looks() {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [looks, setLooks] = useState(looksIniciais);
   const [categoriaAtiva, setCategoriaAtiva] = useState("Todos");
@@ -110,61 +112,81 @@ function Looks() {
   });
 
   return (
-    <div className="closet-layout">
+    <div className="closet-page">
       {/* SIDEBAR */}
-      <aside className="closet-sidebar">
-        <Link to="/" className="closet-brand">
-          GRWM
-        </Link>
+     {/* SIDEBAR */}
+<aside className="closet-sidebar">
 
-        <nav className="closet-nav">
-          <Link to="/" className={`closet-nav-item ${menuAtivo("/")}`}>
-            <HomeIcon size={17} strokeWidth={1.6} />
-            <span>Início</span>
-          </Link>
+  <Link to="/" className="closet-brand">
+    <span>SEU CLOSET</span>
+    <h2>GRWM</h2>
+  </Link>
 
-          <Link
-            to="/closet"
-            className={`closet-nav-item ${menuAtivo("/closet")}`}
-          >
-            <Shirt size={17} strokeWidth={1.6} />
-            <span>Closet</span>
-          </Link>
+  <nav className="closet-nav">
 
-          <Link
-            to="/looks"
-            className={`closet-nav-item ${menuAtivo("/looks")}`}
-          >
-            <Star size={17} strokeWidth={1.6} />
-            <span>Looks</span>
-          </Link>
+    <Link
+      to="/"
+      className={`closet-nav-item ${menuAtivo("/")}`}
+    >
+      <HomeIcon size={17} strokeWidth={1.6} />
+      <span>Início</span>
+    </Link>
 
-          <Link to="/looks" className="closet-nav-item">
-            <Heart size={17} strokeWidth={1.6} />
-            <span>Favoritos</span>
-          </Link>
+    <Link
+      to="/closet"
+      className={`closet-nav-item ${menuAtivo("/closet")}`}
+    >
+      <Shirt size={17} strokeWidth={1.6} />
+      <span>Closet</span>
+    </Link>
 
-          <Link to="/looks" className="closet-nav-item">
-            <Plane size={17} strokeWidth={1.6} />
-            <span>Viagem</span>
-          </Link>
+    <Link
+      to="/looks"
+      className={`closet-nav-item ${menuAtivo("/looks")}`}
+    >
+      <Star size={17} strokeWidth={1.6} />
+      <span>Looks</span>
+    </Link>
 
-          <Link to="/looks" className="closet-nav-item">
-            <Sparkles size={17} strokeWidth={1.6} />
-            <span>Inspiração</span>
-          </Link>
-        </nav>
+    <Link
+      to="/looks"
+      className="closet-nav-item"
+    >
+      <Plane size={17} strokeWidth={1.6} />
+      <span>Viagem</span>
+    </Link>
 
-        <div className="closet-sidebar-bottom">
-          <Link
-            to="/perfil"
-            className={`closet-nav-item ${menuAtivo("/perfil")}`}
-          >
-            <UserRound size={17} strokeWidth={1.6} />
-            <span>Meu perfil</span>
-          </Link>
-        </div>
-      </aside>
+    <Link
+      to="/looks"
+      className="closet-nav-item"
+    >
+      <Heart size={17} strokeWidth={1.6} />
+      <span>Favoritos</span>
+    </Link>
+
+    <Link
+      to="/looks"
+      className="closet-nav-item"
+    >
+      <Sparkles size={17} strokeWidth={1.6} />
+      <span>Inspiração</span>
+    </Link>
+
+    <Link
+      to="/perfil"
+      className={`closet-nav-item ${menuAtivo("/perfil")}`}
+    >
+      <UserRound size={17} strokeWidth={1.6} />
+      <span>Perfil</span>
+    </Link>
+
+  </nav>
+
+  <div className="closet-motto">
+    sem limites.
+  </div>
+
+</aside>
 
       {/* CONTEÚDO */}
       <main className="closet-content looks-page">
@@ -179,10 +201,25 @@ function Looks() {
             </p>
           </div>
 
-          <Link to="/looks/criar" className="looks-create-button">
-            <Plus size={16} strokeWidth={2} />
-            Criar look
-          </Link>
+          <div className="looks-header-actions">
+
+  <Link
+    to="/montar-look"
+    className="looks-ai-button"
+  >
+    <Sparkles size={15} strokeWidth={1.7} />
+    Montar meu look
+  </Link>
+
+  <Link
+    to="/looks/criar"
+    className="looks-create-button"
+  >
+    <Plus size={16} strokeWidth={2} />
+    Criar look
+  </Link>
+
+</div>
         </header>
 
         {/* FILTROS */}
@@ -218,7 +255,7 @@ function Looks() {
               <article
                 key={look.id}
                 className="look-card"
-                onClick={() => setLookSelecionado(look)}
+                onClick={() => navigate(`/looks/${look.id}`)}
               >
                 <div className="look-photo">
                   <img src={look.imagem} alt={look.nome} />
