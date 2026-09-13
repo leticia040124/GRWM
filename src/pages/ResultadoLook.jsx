@@ -192,7 +192,7 @@ function ResultadoLook() {
           </Link>
 
           <Link
-            to="/looks"
+            to="/viagem"
             className="closet-nav-item"
           >
             <Plane size={17} strokeWidth={1.6} />
@@ -200,7 +200,7 @@ function ResultadoLook() {
           </Link>
 
           <Link
-            to="/looks"
+            to="/favoritos"
             className="closet-nav-item"
           >
             <Heart size={17} strokeWidth={1.6} />
@@ -208,7 +208,7 @@ function ResultadoLook() {
           </Link>
 
           <Link
-            to="/looks"
+            to="/inspiracao"
             className="closet-nav-item"
           >
             <Sparkles size={17} strokeWidth={1.6} />

@@ -352,7 +352,7 @@ function GuardaRoupa() {
 
 
           <Link
-            to="/looks"
+            to="/viagem"
             className="closet-nav-item"
           >
             <Plane
@@ -364,7 +364,7 @@ function GuardaRoupa() {
 
 
           <Link
-            to="/looks"
+            to="/favoritos"
             className="closet-nav-item"
           >
             <Heart
@@ -376,7 +376,7 @@ function GuardaRoupa() {
 
 
           <Link
-            to="/looks"
+            to="/inspiracao"
             className="closet-nav-item"
           >
             <Sparkles

@@ -211,17 +211,17 @@ function EditarLook() {
             <span>Looks</span>
           </Link>
 
-          <Link to="/looks" className="closet-nav-item">
+          <Link to="/favoritos" className="closet-nav-item">
             <Heart size={17} strokeWidth={1.6} />
             <span>Favoritos</span>
           </Link>
 
-          <Link to="/looks" className="closet-nav-item">
+          <Link to="/viagem" className="closet-nav-item">
             <Plane size={17} strokeWidth={1.6} />
             <span>Viagem</span>
           </Link>
 
-          <Link to="/looks" className="closet-nav-item">
+          <Link to="/inspiracao" className="closet-nav-item">
             <Sparkles size={17} strokeWidth={1.6} />
             <span>Inspiração</span>
           </Link>
