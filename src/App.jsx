@@ -6,6 +6,7 @@ import Cadastro from "./pages/Cadastro";
 import GuardaRoupa from "./pages/GuardaRoupa";
 import Looks from "./pages/Looks";
 import Perfil from "./pages/Perfil";
+import CriarLook from "./pages/CriarLook";
 
 function App() {
   return (
@@ -22,6 +23,9 @@ function App() {
         <Route path="/looks" element={<Looks />} />
 
         <Route path="/perfil" element={<Perfil />} />
+
+        <Route path="/looks/criar" element={<CriarLook />} />
+      
       </Routes>
     </BrowserRouter>
   );
