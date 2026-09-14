@@ -30,12 +30,139 @@ function ResultadoLook() {
     pecas = [],
   } = preferencias;
 
-  /*
-    Por enquanto, a montagem é simulada no front.
-    Depois podemos substituir por uma lógica mais inteligente.
-  */
+  // --------------------------------------------------
+  // NORMALIZAÇÃO
+  // --------------------------------------------------
 
-  // Peças que o usuário escolheu obrigatoriamente usar
+  const normalizar = (valor) => {
+    if (!valor) return "";
+
+    return valor
+      .toString()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim();
+  };
+
+  // --------------------------------------------------
+  // CORES
+  // --------------------------------------------------
+
+  const coresEscuras = [
+    "preto",
+    "preta",
+    "azul marinho",
+    "marinho",
+    "cinza escuro",
+    "cinza",
+    "vinho",
+    "bordo",
+    "marrom",
+    "verde escuro",
+  ];
+
+  const coresClaras = [
+    "branco",
+    "branca",
+    "bege",
+    "creme",
+    "off white",
+    "off-white",
+    "rosa claro",
+    "azul claro",
+    "verde claro",
+    "amarelo",
+  ];
+
+  const coresNeutras = [
+    "preto",
+    "preta",
+    "branco",
+    "branca",
+    "cinza",
+    "bege",
+    "creme",
+    "off white",
+    "off-white",
+    "marrom",
+  ];
+
+  const corCombina = (corPeca, corPreferida) => {
+    const peca = normalizar(corPeca);
+    const preferida = normalizar(corPreferida);
+
+    if (!peca || !preferida) {
+      return false;
+    }
+
+    // Cor específica
+    if (peca === preferida) {
+      return true;
+    }
+
+    // Grupo de cores escuras
+    if (preferida === "escuras") {
+      return coresEscuras.includes(peca);
+    }
+
+    // Grupo de cores claras
+    if (preferida === "claras") {
+      return coresClaras.includes(peca);
+    }
+
+    // Grupo de cores neutras
+    if (preferida === "neutras") {
+      return coresNeutras.includes(peca);
+    }
+
+    return false;
+  };
+
+
+  const coresCombinam = (cor1, cor2) => {
+  const primeira = normalizar(cor1);
+  const segunda = normalizar(cor2);
+
+  if (!primeira || !segunda) {
+    return false;
+  }
+
+  // Mesma cor
+  if (primeira === segunda) {
+    return true;
+  }
+
+  // Cores neutras combinam entre si
+  if (
+    coresNeutras.includes(primeira) &&
+    coresNeutras.includes(segunda)
+  ) {
+    return true;
+  }
+
+  // Preto combina com praticamente tudo
+  if (
+    ["preto", "preta"].includes(primeira) ||
+    ["preto", "preta"].includes(segunda)
+  ) {
+    return true;
+  }
+
+  // Branco combina com praticamente tudo
+  if (
+    ["branco", "branca"].includes(primeira) ||
+    ["branco", "branca"].includes(segunda)
+  ) {
+    return true;
+  }
+
+  return false;
+};
+  // --------------------------------------------------
+  // PEÇAS OBRIGATÓRIAS
+  // --------------------------------------------------
+
   const pecasObrigatorias = pecasUsar.filter(
     (peca) =>
       !pecasEvitar.some(
@@ -43,7 +170,10 @@ function ResultadoLook() {
       )
   );
 
-  // Peças do closet que podem ser usadas
+  // --------------------------------------------------
+  // PEÇAS DISPONÍVEIS
+  // --------------------------------------------------
+
   const pecasDisponiveis = pecas.filter(
     (peca) =>
       !pecasEvitar.some(
@@ -54,150 +184,159 @@ function ResultadoLook() {
       )
   );
 
-const pontuarPeca = (peca) => {
-  let pontos = 0;
+  // --------------------------------------------------
+  // PONTUAÇÃO
+  // --------------------------------------------------
 
-    console.log("DADOS DA PEÇA:", {
-    nome: peca.name,
-    categoria: peca.category,
-    occasion: peca.occasion,
-    temperature: peca.temperature,
-    style: peca.style,
-    color: peca.color,
-  });
+  const pontuarPeca = (peca) => {
+    let pontos = 0;
 
-  console.log("PREFERÊNCIAS:", {
-    ocasiao,
-    clima,
-    estilo,
-    cor,
-  });
+    // Peça escolhida pelo usuário
+    if (
+      pecasUsar.some(
+        (item) => item.id === peca.id
+      )
+    ) {
+      pontos += 1000;
+    }
 
-  
+    // Ocasião
+    if (
+      Array.isArray(peca.occasion) &&
+      peca.occasion.some(
+        (item) =>
+          normalizar(item) === normalizar(ocasiao)
+      )
+    ) {
+      pontos += 30;
+    }
 
-  let pontosEscolhida = 0;
-  let pontosOcasiao = 0;
-  let pontosClima = 0;
-  let pontosEstilo = 0;
-  let pontosCor = 0;
+    // Clima
+    if (
+      peca.temperature &&
+      normalizar(peca.temperature) ===
+        normalizar(clima)
+    ) {
+      pontos += 20;
+    }
 
-  
+    // Estilo
+    if (
+      peca.style &&
+      normalizar(peca.style) ===
+        normalizar(estilo)
+    ) {
+      pontos += 20;
+    }
 
-  // Peça escolhida pelo usuário
-  if (
-    pecasUsar.some(
-      (item) => item.id === peca.id
-    )
-  ) {
-    pontosEscolhida = 100;
-  }
+    // Cor
+    if (
+      peca.color &&
+      corCombina(peca.color, cor)
+    ) {
+      pontos += 10;
+    }
 
-  // Ocasião
-  if (
-    peca.occasion &&
-    peca.occasion.some(
-      (item) =>
-        item.toLowerCase() ===
-        ocasiao.toLowerCase()
-    )
-  ) {
-    pontosOcasiao = 30;
-  }
+    return pontos;
+  };
 
-  // Clima
-  if (
-    peca.temperature &&
-    peca.temperature.toLowerCase() ===
-      clima.toLowerCase()
-  ) {
-    pontosClima = 20;
-  }
-
-  // Estilo
-  if (
-    peca.style &&
-    peca.style.toLowerCase() ===
-      estilo.toLowerCase()
-  ) {
-    pontosEstilo = 20;
-  }
-
-  // Cor
-  if (
-    peca.color &&
-    peca.color.toLowerCase() ===
-      cor.toLowerCase()
-  ) {
-    pontosCor = 10;
-  }
-
-  pontos =
-    pontosEscolhida +
-    pontosOcasiao +
-    pontosClima +
-    pontosEstilo +
-    pontosCor;
-
-  console.log("---- PONTUAÇÃO DA PEÇA ----");
-  console.log("Nome:", peca.name);
-  console.log("Categoria:", peca.category);
-  console.log("Ocasião:", pontosOcasiao);
-  console.log("Clima:", pontosClima);
-  console.log("Estilo:", pontosEstilo);
-  console.log("Cor:", pontosCor);
-  console.log("Escolhida para usar:", pontosEscolhida);
-  console.log("TOTAL:", pontos);
-
-  return pontos;
-};
+  // --------------------------------------------------
+  // ORDENAÇÃO
+  // --------------------------------------------------
 
   const pecasOrdenadas = [...pecasDisponiveis].sort(
     (a, b) => pontuarPeca(b) - pontuarPeca(a)
   );
 
-  console.log(
-    "PEÇAS ORDENADAS:",
-    pecasOrdenadas.map((peca) => ({
-      nome: peca.name,
-      categoria: peca.category,
-      pontos: pontuarPeca(peca),
-    }))
-  );
+  // --------------------------------------------------
+  // CATEGORIAS DO LOOK
+  // --------------------------------------------------
 
-  // Categorias básicas que queremos no look
   const categoriasNecessarias = [
-    "Blusas",
-    "Calças",
-    "Calçados",
+    {
+      nome: "parte de cima",
+      categorias: [
+        "camiseta",
+        "camisa",
+        "blusa",
+        "regata",
+        "cropped",
+      ],
+    },
+    {
+      nome: "parte de baixo",
+      categorias: [
+        "calça",
+        "calca",
+        "shorts",
+        "short",
+        "saia",
+      ],
+    },
+    {
+      nome: "calçado",
+      categorias: [
+        "tênis",
+        "tenis",
+        "sapato",
+        "sandália",
+        "sandalia",
+        "bota",
+        "chinelo",
+      ],
+    },
   ];
 
-  // Procura uma peça para cada categoria
+  // --------------------------------------------------
+  // PEÇAS SUGERIDAS
+  // --------------------------------------------------
+
   const pecasSugeridas = categoriasNecessarias
-    .map((categoria) => {
+    .map((grupo) => {
+      // Primeiro procura uma peça obrigatória
       const obrigatoria = pecasObrigatorias.find(
-        (peca) => peca.category === categoria
+        (peca) =>
+          grupo.categorias.includes(
+            normalizar(peca.category)
+          )
       );
 
       if (obrigatoria) {
         return obrigatoria;
       }
 
-      return pecasOrdenadas.find(
-        (peca) => peca.category === categoria
+      // Se não houver, pega a melhor peça disponível
+      const melhorPeca = pecasOrdenadas.find(
+        (peca) =>
+          grupo.categorias.includes(
+            normalizar(peca.category)
+          )
       );
+
+      return melhorPeca;
     })
     .filter(Boolean);
 
-  // Junta as peças obrigatórias com as sugeridas
+  // --------------------------------------------------
+  // LOOK FINAL
+  // --------------------------------------------------
+
+  const idsJaSelecionados = new Set(
+    pecasObrigatorias.map((peca) => peca.id)
+  );
+
+  const sugestoesNovas = pecasSugeridas.filter(
+    (peca) => !idsJaSelecionados.has(peca.id)
+  );
+
   const lookFinal = [
     ...pecasObrigatorias,
-    ...pecasSugeridas.filter(
-      (peca) =>
-        !pecasObrigatorias.some(
-          (obrigatoria) => obrigatoria.id === peca.id
-        )
-    ),
-  ].slice(0, 5);
+    ...sugestoesNovas,
+  ];
+
+  // --------------------------------------------------
+  // AÇÕES
+  // --------------------------------------------------
 
   const salvarLook = () => {
     alert("Look salvo com sucesso!");
@@ -381,10 +520,11 @@ const pontuarPeca = (peca) => {
             {lookFinal.map((peca, index) => (
 
               <article
-                className={`result-look-piece ${index === 0
-                  ? "result-look-piece-featured"
-                  : ""
-                  }`}
+                className={`result-look-piece ${
+                  index === 0
+                    ? "result-look-piece-featured"
+                    : ""
+                }`}
                 key={peca.id}
               >
 
@@ -396,7 +536,7 @@ const pontuarPeca = (peca) => {
                   />
 
                   <div className="result-look-piece-number">
-                    0{index + 1}
+                    {String(index + 1).padStart(2, "0")}
                   </div>
 
                 </div>
@@ -404,6 +544,7 @@ const pontuarPeca = (peca) => {
                 <div className="result-look-piece-info">
 
                   <div>
+
                     <strong>
                       {peca.name}
                     </strong>
@@ -411,6 +552,7 @@ const pontuarPeca = (peca) => {
                     <span>
                       {peca.category}
                     </span>
+
                   </div>
 
                   <button
