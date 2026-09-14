@@ -14,65 +14,6 @@ import {
   Check,
 } from "lucide-react";
 
-const pecasBase = [
-  {
-    id: 1,
-    nome: "Camiseta branca",
-    categoria: "Blusas",
-    imagem:
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=700&q=80",
-  },
-  {
-    id: 2,
-    nome: "Blazer preto",
-    categoria: "Casacos",
-    imagem:
-      "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=700&q=80",
-  },
-  {
-    id: 3,
-    nome: "Jeans reto",
-    categoria: "Calças",
-    imagem:
-      "https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=700&q=80",
-  },
-  {
-    id: 4,
-    nome: "Calça preta",
-    categoria: "Calças",
-    imagem:
-      "https://images.unsplash.com/photo-1506629905607-d9c297d5d6a1?auto=format&fit=crop&w=700&q=80",
-  },
-  {
-    id: 5,
-    nome: "Tênis branco",
-    categoria: "Calçados",
-    imagem:
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=700&q=80",
-  },
-  {
-    id: 6,
-    nome: "Camisa branca",
-    categoria: "Blusas",
-    imagem:
-      "https://images.unsplash.com/photo-1603252110481-7ba873bf42ab?auto=format&fit=crop&w=700&q=80",
-  },
-  {
-    id: 7,
-    nome: "Bota preta",
-    categoria: "Calçados",
-    imagem:
-      "https://images.unsplash.com/photo-1608256246200-53e635b5b65f?auto=format&fit=crop&w=700&q=80",
-  },
-  {
-    id: 8,
-    nome: "Blusa bege",
-    categoria: "Blusas",
-    imagem:
-      "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=700&q=80",
-  },
-];
-
 function ResultadoLook() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -86,14 +27,15 @@ function ResultadoLook() {
     cor = "Neutras",
     pecasUsar = [],
     pecasEvitar = [],
+    pecas = [],
   } = preferencias;
 
   /*
     Por enquanto, a montagem é simulada no front.
-    Quando entrarmos na parte de IA/backend,
-    essa lógica será substituída pela recomendação real.
+    Depois podemos substituir por uma lógica mais inteligente.
   */
 
+  // Peças que o usuário escolheu obrigatoriamente usar
   const pecasObrigatorias = pecasUsar.filter(
     (peca) =>
       !pecasEvitar.some(
@@ -101,7 +43,8 @@ function ResultadoLook() {
       )
   );
 
-  const pecasDisponiveis = pecasBase.filter(
+  // Peças do closet que podem ser usadas
+  const pecasDisponiveis = pecas.filter(
     (peca) =>
       !pecasEvitar.some(
         (evitar) => evitar.id === peca.id
@@ -111,28 +54,141 @@ function ResultadoLook() {
       )
   );
 
+const pontuarPeca = (peca) => {
+  let pontos = 0;
+
+    console.log("DADOS DA PEÇA:", {
+    nome: peca.name,
+    categoria: peca.category,
+    occasion: peca.occasion,
+    temperature: peca.temperature,
+    style: peca.style,
+    color: peca.color,
+  });
+
+  console.log("PREFERÊNCIAS:", {
+    ocasiao,
+    clima,
+    estilo,
+    cor,
+  });
+
+  
+
+  let pontosEscolhida = 0;
+  let pontosOcasiao = 0;
+  let pontosClima = 0;
+  let pontosEstilo = 0;
+  let pontosCor = 0;
+
+  
+
+  // Peça escolhida pelo usuário
+  if (
+    pecasUsar.some(
+      (item) => item.id === peca.id
+    )
+  ) {
+    pontosEscolhida = 100;
+  }
+
+  // Ocasião
+  if (
+    peca.occasion &&
+    peca.occasion.some(
+      (item) =>
+        item.toLowerCase() ===
+        ocasiao.toLowerCase()
+    )
+  ) {
+    pontosOcasiao = 30;
+  }
+
+  // Clima
+  if (
+    peca.temperature &&
+    peca.temperature.toLowerCase() ===
+      clima.toLowerCase()
+  ) {
+    pontosClima = 20;
+  }
+
+  // Estilo
+  if (
+    peca.style &&
+    peca.style.toLowerCase() ===
+      estilo.toLowerCase()
+  ) {
+    pontosEstilo = 20;
+  }
+
+  // Cor
+  if (
+    peca.color &&
+    peca.color.toLowerCase() ===
+      cor.toLowerCase()
+  ) {
+    pontosCor = 10;
+  }
+
+  pontos =
+    pontosEscolhida +
+    pontosOcasiao +
+    pontosClima +
+    pontosEstilo +
+    pontosCor;
+
+  console.log("---- PONTUAÇÃO DA PEÇA ----");
+  console.log("Nome:", peca.name);
+  console.log("Categoria:", peca.category);
+  console.log("Ocasião:", pontosOcasiao);
+  console.log("Clima:", pontosClima);
+  console.log("Estilo:", pontosEstilo);
+  console.log("Cor:", pontosCor);
+  console.log("Escolhida para usar:", pontosEscolhida);
+  console.log("TOTAL:", pontos);
+
+  return pontos;
+};
+
+  const pecasOrdenadas = [...pecasDisponiveis].sort(
+    (a, b) => pontuarPeca(b) - pontuarPeca(a)
+  );
+
+  console.log(
+    "PEÇAS ORDENADAS:",
+    pecasOrdenadas.map((peca) => ({
+      nome: peca.name,
+      categoria: peca.category,
+      pontos: pontuarPeca(peca),
+    }))
+  );
+
+  // Categorias básicas que queremos no look
   const categoriasNecessarias = [
     "Blusas",
     "Calças",
     "Calçados",
   ];
 
-  const pecasSugeridas = categoriasNecessarias.map(
-    (categoria) => {
+  // Procura uma peça para cada categoria
+  const pecasSugeridas = categoriasNecessarias
+    .map((categoria) => {
       const obrigatoria = pecasObrigatorias.find(
-        (peca) => peca.categoria === categoria
+        (peca) => peca.category === categoria
       );
 
       if (obrigatoria) {
         return obrigatoria;
       }
 
-      return pecasDisponiveis.find(
-        (peca) => peca.categoria === categoria
+      return pecasOrdenadas.find(
+        (peca) => peca.category === categoria
       );
-    }
-  ).filter(Boolean);
+    })
+    .filter(Boolean);
 
+  // Junta as peças obrigatórias com as sugeridas
   const lookFinal = [
     ...pecasObrigatorias,
     ...pecasSugeridas.filter(
@@ -325,19 +381,18 @@ function ResultadoLook() {
             {lookFinal.map((peca, index) => (
 
               <article
-                className={`result-look-piece ${
-                  index === 0
-                    ? "result-look-piece-featured"
-                    : ""
-                }`}
+                className={`result-look-piece ${index === 0
+                  ? "result-look-piece-featured"
+                  : ""
+                  }`}
                 key={peca.id}
               >
 
                 <div className="result-look-piece-image">
 
                   <img
-                    src={peca.imagem}
-                    alt={peca.nome}
+                    src={peca.image_url}
+                    alt={peca.name}
                   />
 
                   <div className="result-look-piece-number">
@@ -350,17 +405,17 @@ function ResultadoLook() {
 
                   <div>
                     <strong>
-                      {peca.nome}
+                      {peca.name}
                     </strong>
 
                     <span>
-                      {peca.categoria}
+                      {peca.category}
                     </span>
                   </div>
 
                   <button
                     type="button"
-                    aria-label={`Favoritar ${peca.nome}`}
+                    aria-label={`Favoritar ${peca.name}`}
                   >
                     <HeartIcon
                       size={15}
