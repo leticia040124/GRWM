@@ -13,7 +13,8 @@ function Login() {
   const entrar = (event) => {
     event.preventDefault();
 
-    navigate("/");
+    // Depois vamos colocar a validação/login real aqui.
+    navigate("/home");
   };
 
   return (
@@ -28,9 +29,15 @@ function Login() {
       <main className="auth-main">
         <section className="auth-card">
           <div className="auth-heading">
-            <span className="auth-eyebrow">BEM-VINDA DE VOLTA</span>
+            <span className="auth-eyebrow">
+              BEM-VINDA DE VOLTA
+            </span>
 
-            <h2>Seu closet<br />estava esperando.</h2>
+            <h2>
+              Seu closet
+              <br />
+              estava esperando.
+            </h2>
 
             <p>
               Entre na sua conta para continuar organizando
@@ -93,7 +100,10 @@ function Login() {
               </div>
             </div>
 
-            <button type="submit" className="auth-submit">
+            <button
+              type="submit"
+              className="auth-submit"
+            >
               Entrar
               <ArrowRight size={15} />
             </button>

@@ -163,7 +163,7 @@ function CombinarLook() {
       {/* SIDEBAR */}
       <aside className="closet-sidebar">
 
-        <Link to="/" className="closet-brand">
+        <Link to="/home" className="closet-brand">
           <span>SEU CLOSET</span>
           <h2>GRWM</h2>
         </Link>
@@ -171,8 +171,8 @@ function CombinarLook() {
         <nav className="closet-nav">
 
           <Link
-            to="/"
-            className={menuAtivo("/") === "active"
+            to="/home"
+            className={menuAtivo("/home") === "active"
               ? "closet-nav-item active"
               : "closet-nav-item"}
           >

@@ -196,7 +196,7 @@ function EditarLook() {
         </Link>
 
         <nav className="closet-nav">
-          <Link to="/" className="closet-nav-item">
+          <Link to="/home" className="closet-nav-item">
             <HomeIcon size={17} strokeWidth={1.6} />
             <span>Início</span>
           </Link>

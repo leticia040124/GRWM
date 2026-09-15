@@ -316,8 +316,8 @@ function GuardaRoupa() {
         <nav className="closet-nav">
 
           <Link
-            to="/"
-            className={menuAtivo("/")}
+            to="/home"
+            className={menuAtivo("/home")}
           >
             <HomeIcon
               size={17}
