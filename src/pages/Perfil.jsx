@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import {
@@ -12,7 +12,12 @@ import {
   Camera,
   ChevronRight,
   Check,
-  ArrowLeft,
+  Palette,
+  CalendarDays,
+  User,
+  LockKeyhole,
+  LogOut,
+  X,
 } from "lucide-react";
 
 import "../App.css";
@@ -20,16 +25,36 @@ import "../App.css";
 function Perfil() {
   const location = useLocation();
   const navigate = useNavigate();
+  const inputFotoRef = useRef(null);
 
   const [nome, setNome] = useState("Loren");
   const [email, setEmail] = useState("loren@email.com");
+
+  const [nomeTemporario, setNomeTemporario] = useState("Loren");
+  const [emailTemporario, setEmailTemporario] =
+    useState("loren@email.com");
+
   const [editando, setEditando] = useState(false);
   const [salvo, setSalvo] = useState(false);
+
+  const [foto, setFoto] = useState(null);
 
   const [estilos, setEstilos] = useState([
     "Minimalista",
     "Elegante",
     "Casual",
+  ]);
+
+  const [cores, setCores] = useState([
+    "Preto",
+    "Branco",
+    "Marrom",
+  ]);
+
+  const [ocasioes, setOcasioes] = useState([
+    "Dia a dia",
+    "Faculdade",
+    "Passeios",
   ]);
 
   const estilosDisponiveis = [
@@ -41,22 +66,62 @@ function Perfil() {
     "Esportivo",
   ];
 
+  const coresDisponiveis = [
+    "Preto",
+    "Branco",
+    "Marrom",
+    "Bege",
+    "Vermelho",
+    "Azul",
+    "Verde",
+    "Rosa",
+  ];
+
+  const ocasioesDisponiveis = [
+    "Dia a dia",
+    "Faculdade",
+    "Trabalho",
+    "Passeios",
+    "Festas",
+    "Eventos",
+    "Viagens",
+  ];
+
   const menuAtivo = (rota) => {
     return location.pathname === rota
       ? "closet-nav-item active"
       : "closet-nav-item";
   };
 
-  const alternarEstilo = (estilo) => {
-    setEstilos((atual) =>
-      atual.includes(estilo)
-        ? atual.filter((item) => item !== estilo)
-        : [...atual, estilo]
+  const alternarItem = (item, setLista) => {
+    setLista((atual) =>
+      atual.includes(item)
+        ? atual.filter((valor) => valor !== item)
+        : [...atual, item]
     );
+  };
+
+  const iniciarEdicao = () => {
+    setNomeTemporario(nome);
+    setEmailTemporario(email);
+    setEditando(true);
+  };
+
+  const cancelarEdicao = () => {
+    setNomeTemporario(nome);
+    setEmailTemporario(email);
+    setEditando(false);
   };
 
   const salvarPerfil = (event) => {
     event.preventDefault();
+
+    if (!nomeTemporario.trim() || !emailTemporario.trim()) {
+      return;
+    }
+
+    setNome(nomeTemporario.trim());
+    setEmail(emailTemporario.trim());
 
     setEditando(false);
     setSalvo(true);
@@ -66,6 +131,32 @@ function Perfil() {
     }, 2500);
   };
 
+  const abrirSeletorFoto = () => {
+    inputFotoRef.current?.click();
+  };
+
+  const alterarFoto = (event) => {
+    const arquivo = event.target.files?.[0];
+
+    if (!arquivo) return;
+
+    const leitor = new FileReader();
+
+    leitor.onload = () => {
+      setFoto(leitor.result);
+    };
+
+    leitor.readAsDataURL(arquivo);
+  };
+
+  const removerFoto = () => {
+    setFoto(null);
+
+    if (inputFotoRef.current) {
+      inputFotoRef.current.value = "";
+    }
+  };
+
   const sair = () => {
     navigate("/login");
   };
@@ -73,7 +164,10 @@ function Perfil() {
   return (
     <div className="closet-page profile-page">
 
-      {/* SIDEBAR */}
+      {/* =========================
+          SIDEBAR
+      ========================= */}
+
       <aside className="closet-sidebar">
 
         <Link to="/home" className="closet-brand">
@@ -83,61 +177,120 @@ function Perfil() {
 
         <nav className="closet-nav">
 
-          <Link to="/home" className={menuAtivo("/home")}>
-            <HomeIcon size={17} strokeWidth={1.6} />
+          <Link
+            to="/home"
+            className={menuAtivo("/home")}
+          >
+            <HomeIcon
+              size={17}
+              strokeWidth={1.6}
+            />
             <span>Início</span>
           </Link>
 
-          <Link to="/closet" className={menuAtivo("/closet")}>
-            <Shirt size={17} strokeWidth={1.6} />
+          <Link
+            to="/closet"
+            className={menuAtivo("/closet")}
+          >
+            <Shirt
+              size={17}
+              strokeWidth={1.6}
+            />
             <span>Closet</span>
           </Link>
 
-          <Link to="/looks" className={menuAtivo("/looks")}>
-            <Star size={17} strokeWidth={1.6} />
+          <Link
+            to="/looks"
+            className={menuAtivo("/looks")}
+          >
+            <Star
+              size={17}
+              strokeWidth={1.6}
+            />
             <span>Looks</span>
           </Link>
 
-          <Link to="/viagem" className="closet-nav-item">
-            <Plane size={17} strokeWidth={1.6} />
+          <Link
+            to="/viagem"
+            className={menuAtivo("/viagem")}
+          >
+            <Plane
+              size={17}
+              strokeWidth={1.6}
+            />
             <span>Viagem</span>
           </Link>
 
-          <Link to="/favoritos" className="closet-nav-item">
-            <Heart size={17} strokeWidth={1.6} />
+          <Link
+            to="/favoritos"
+            className={menuAtivo("/favoritos")}
+          >
+            <Heart
+              size={17}
+              strokeWidth={1.6}
+            />
             <span>Favoritos</span>
           </Link>
 
-          <Link to="/inspiracao" className="closet-nav-item">
-            <Sparkles size={17} strokeWidth={1.6} />
+          <Link
+            to="/inspiracao"
+            className={menuAtivo("/inspiracao")}
+          >
+            <Sparkles
+              size={17}
+              strokeWidth={1.6}
+            />
             <span>Inspiração</span>
           </Link>
 
-          <Link to="/perfil" className={menuAtivo("/perfil")}>
-            <UserRound size={17} strokeWidth={1.6} />
+          <Link
+            to="/perfil"
+            className={menuAtivo("/perfil")}
+          >
+            <UserRound
+              size={17}
+              strokeWidth={1.6}
+            />
             <span>Perfil</span>
           </Link>
 
         </nav>
 
-        <div className="closet-motto">
-          sem limites.
+        <div className="closet-sidebar-footer">
+          <span>sem limites.</span>
         </div>
 
       </aside>
 
 
-      {/* CONTEÚDO */}
+      {/* =========================
+          CONTEÚDO
+      ========================= */}
+
       <main className="closet-content profile-content">
 
-        <Link to="/" className="profile-back">
-          <ArrowLeft size={14} />
+        {/* VOLTAR */}
+
+        <Link
+          to="/home"
+          className="profile-back"
+        >
+          <ChevronRight
+            size={14}
+            style={{
+              transform: "rotate(180deg)",
+            }}
+          />
           Voltar para início
         </Link>
+
+
+        {/* HEADER */}
 
         <header className="profile-header">
 
           <div>
+
             <span className="home-eyebrow">
               MINHA CONTA
             </span>
@@ -147,14 +300,17 @@ function Perfil() {
             </h1>
 
             <p>
-              Cuide das suas informações e personalize sua experiência no GRWM.
+              Cuide das suas informações e
+              personalize sua experiência no GRWM.
             </p>
+
           </div>
 
           {!editando && (
             <button
+              type="button"
               className="profile-edit-button"
-              onClick={() => setEditando(true)}
+              onClick={iniciarEdicao}
             >
               Editar perfil
             </button>
@@ -163,37 +319,81 @@ function Perfil() {
         </header>
 
 
+        {/* MENSAGEM DE SUCESSO */}
+
         {salvo && (
           <div className="profile-success">
-            <Check size={15} />
-            Alterações salvas com sucesso.
+
+            <Check
+              size={15}
+              strokeWidth={1.8}
+            />
+
+            <span>
+              Alterações salvas com sucesso.
+            </span>
+
           </div>
         )}
 
 
-        {/* PERFIL + PREFERÊNCIAS */}
+        {/* =========================
+            PERFIL + PREFERÊNCIAS
+        ========================= */}
+
         <section className="profile-layout">
 
-          {/* CARD DO PERFIL */}
+          {/* CARD PRINCIPAL */}
+
           <div className="profile-main-card">
 
             <div className="profile-cover">
 
               <div className="profile-avatar">
 
-                <span>
-                  {nome.charAt(0).toUpperCase()}
-                </span>
+                {foto ? (
+                  <img
+                    src={foto}
+                    alt="Foto de perfil"
+                  />
+                ) : (
+                  <span>
+                    {nome.charAt(0).toUpperCase()}
+                  </span>
+                )}
 
                 <button
-                  className="profile-camera"
                   type="button"
-                  aria-label="Alterar foto"
+                  className="profile-camera"
+                  onClick={abrirSeletorFoto}
+                  aria-label="Alterar foto de perfil"
                 >
-                  <Camera size={13} />
+                  <Camera
+                    size={13}
+                    strokeWidth={1.6}
+                  />
                 </button>
 
+                <input
+                  ref={inputFotoRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={alterarFoto}
+                  style={{ display: "none" }}
+                />
+
               </div>
+
+              {foto && (
+                <button
+                  type="button"
+                  className="profile-remove-photo"
+                  onClick={removerFoto}
+                >
+                  <X size={13} />
+                  Remover foto
+                </button>
+              )}
 
             </div>
 
@@ -202,10 +402,27 @@ function Perfil() {
 
               {editando ? (
 
+                /* =========================
+                   FORMULÁRIO DE EDIÇÃO
+                ========================= */
+
                 <form
                   className="profile-form"
                   onSubmit={salvarPerfil}
                 >
+
+                  <div className="profile-form-title">
+
+                    <span className="profile-card-eyebrow">
+                      EDITANDO PERFIL
+                    </span>
+
+                    <h2>
+                      Suas informações
+                    </h2>
+
+                  </div>
+
 
                   <div className="profile-field">
 
@@ -213,14 +430,27 @@ function Perfil() {
                       Nome
                     </label>
 
-                    <input
-                      id="perfil-nome"
-                      type="text"
-                      value={nome}
-                      onChange={(event) =>
-                        setNome(event.target.value)
-                      }
-                    />
+                    <div className="profile-input-wrapper">
+
+                      <User
+                        size={15}
+                        strokeWidth={1.5}
+                      />
+
+                      <input
+                        id="perfil-nome"
+                        type="text"
+                        value={nomeTemporario}
+                        onChange={(event) =>
+                          setNomeTemporario(
+                            event.target.value
+                          )
+                        }
+                        placeholder="Seu nome"
+                        required
+                      />
+
+                    </div>
 
                   </div>
 
@@ -231,14 +461,26 @@ function Perfil() {
                       E-mail
                     </label>
 
-                    <input
-                      id="perfil-email"
-                      type="email"
-                      value={email}
-                      onChange={(event) =>
-                        setEmail(event.target.value)
-                      }
-                    />
+                    <div className="profile-input-wrapper">
+
+                      <span className="profile-input-at">
+                        @
+                      </span>
+
+                      <input
+                        id="perfil-email"
+                        type="email"
+                        value={emailTemporario}
+                        onChange={(event) =>
+                          setEmailTemporario(
+                            event.target.value
+                          )
+                        }
+                        placeholder="seuemail@email.com"
+                        required
+                      />
+
+                    </div>
 
                   </div>
 
@@ -248,7 +490,7 @@ function Perfil() {
                     <button
                       type="button"
                       className="profile-cancel-button"
-                      onClick={() => setEditando(false)}
+                      onClick={cancelarEdicao}
                     >
                       Cancelar
                     </button>
@@ -257,6 +499,10 @@ function Perfil() {
                       type="submit"
                       className="profile-save-button"
                     >
+                      <Check
+                        size={15}
+                        strokeWidth={1.8}
+                      />
                       Salvar alterações
                     </button>
 
@@ -265,6 +511,10 @@ function Perfil() {
                 </form>
 
               ) : (
+
+                /* =========================
+                   VISUALIZAÇÃO DO PERFIL
+                ========================= */
 
                 <>
 
@@ -287,18 +537,39 @@ function Perfil() {
                   <div className="profile-stats">
 
                     <div>
-                      <strong>24</strong>
-                      <span>Peças</span>
+
+                      <strong>
+                        24
+                      </strong>
+
+                      <span>
+                        Peças
+                      </span>
+
                     </div>
 
                     <div>
-                      <strong>08</strong>
-                      <span>Looks</span>
+
+                      <strong>
+                        08
+                      </strong>
+
+                      <span>
+                        Looks
+                      </span>
+
                     </div>
 
                     <div>
-                      <strong>05</strong>
-                      <span>Favoritos</span>
+
+                      <strong>
+                        05
+                      </strong>
+
+                      <span>
+                        Favoritos
+                      </span>
+
                     </div>
 
                   </div>
@@ -312,7 +583,10 @@ function Perfil() {
           </div>
 
 
-          {/* PREFERÊNCIAS */}
+          {/* =========================
+              SEU ESTILO
+          ========================= */}
+
           <div className="profile-preferences-card">
 
             <div className="profile-section-heading">
@@ -326,7 +600,8 @@ function Perfil() {
               </h2>
 
               <p>
-                Escolha os estilos que mais combinam com você.
+                Escolha os estilos que mais combinam
+                com você.
               </p>
 
             </div>
@@ -336,7 +611,8 @@ function Perfil() {
 
               {estilosDisponiveis.map((estilo) => {
 
-                const selecionado = estilos.includes(estilo);
+                const selecionado =
+                  estilos.includes(estilo);
 
                 return (
                   <button
@@ -345,7 +621,12 @@ function Perfil() {
                     className={`profile-style-option ${
                       selecionado ? "selected" : ""
                     }`}
-                    onClick={() => alternarEstilo(estilo)}
+                    onClick={() =>
+                      alternarItem(
+                        estilo,
+                        setEstilos
+                      )
+                    }
                   >
 
                     <span>
@@ -353,7 +634,10 @@ function Perfil() {
                     </span>
 
                     {selecionado && (
-                      <Check size={14} />
+                      <Check
+                        size={14}
+                        strokeWidth={1.8}
+                      />
                     )}
 
                   </button>
@@ -368,7 +652,160 @@ function Perfil() {
         </section>
 
 
-        {/* CONFIGURAÇÕES */}
+        {/* =========================
+            PREFERÊNCIAS
+        ========================= */}
+
+        <section className="profile-extra-preferences">
+
+          {/* CORES */}
+
+          <div className="profile-preference-block">
+
+            <div className="profile-preference-heading">
+
+              <div className="profile-preference-icon">
+                <Palette
+                  size={17}
+                  strokeWidth={1.5}
+                />
+              </div>
+
+              <div>
+
+                <span>
+                  CORES FAVORITAS
+                </span>
+
+                <h2>
+                  Paleta que combina com você
+                </h2>
+
+              </div>
+
+            </div>
+
+
+            <div className="profile-chip-list">
+
+              {coresDisponiveis.map((cor) => {
+
+                const selecionada =
+                  cores.includes(cor);
+
+                return (
+                  <button
+                    key={cor}
+                    type="button"
+                    className={`profile-chip ${
+                      selecionada
+                        ? "selected"
+                        : ""
+                    }`}
+                    onClick={() =>
+                      alternarItem(
+                        cor,
+                        setCores
+                      )
+                    }
+                  >
+
+                    {cor}
+
+                    {selecionada && (
+                      <Check
+                        size={12}
+                        strokeWidth={1.8}
+                      />
+                    )}
+
+                  </button>
+                );
+
+              })}
+
+            </div>
+
+          </div>
+
+
+          {/* OCASIÕES */}
+
+          <div className="profile-preference-block">
+
+            <div className="profile-preference-heading">
+
+              <div className="profile-preference-icon">
+                <CalendarDays
+                  size={17}
+                  strokeWidth={1.5}
+                />
+              </div>
+
+              <div>
+
+                <span>
+                  OCASIÕES
+                </span>
+
+                <h2>
+                  Onde você mais usa seus looks
+                </h2>
+
+              </div>
+
+            </div>
+
+
+            <div className="profile-chip-list">
+
+              {ocasioesDisponiveis.map((ocasiao) => {
+
+                const selecionada =
+                  ocasioes.includes(ocasiao);
+
+                return (
+                  <button
+                    key={ocasiao}
+                    type="button"
+                    className={`profile-chip ${
+                      selecionada
+                        ? "selected"
+                        : ""
+                    }`}
+                    onClick={() =>
+                      alternarItem(
+                        ocasiao,
+                        setOcasioes
+                      )
+                    }
+                  >
+
+                    {ocasiao}
+
+                    {selecionada && (
+                      <Check
+                        size={12}
+                        strokeWidth={1.8}
+                      />
+                    )}
+
+                  </button>
+                );
+
+              })}
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        {/* =========================
+            CONFIGURAÇÕES
+        ========================= */}
+
         <section className="profile-settings">
 
           <div className="profile-settings-heading">
@@ -389,19 +826,40 @@ function Perfil() {
             <button
               type="button"
               className="profile-setting-item"
+              onClick={() =>
+                alert(
+                  "A alteração de senha será implementada na próxima etapa."
+                )
+              }
             >
 
-              <div>
-                <strong>
-                  Alterar senha
-                </strong>
+              <div className="profile-setting-left">
 
-                <span>
-                  Atualize sua senha de acesso
-                </span>
+                <div className="profile-setting-icon">
+                  <LockKeyhole
+                    size={16}
+                    strokeWidth={1.5}
+                  />
+                </div>
+
+                <div>
+
+                  <strong>
+                    Alterar senha
+                  </strong>
+
+                  <span>
+                    Atualize sua senha de acesso
+                  </span>
+
+                </div>
+
               </div>
 
-              <ChevronRight size={16} />
+              <ChevronRight
+                size={16}
+                strokeWidth={1.5}
+              />
 
             </button>
 
@@ -409,19 +867,42 @@ function Perfil() {
             <button
               type="button"
               className="profile-setting-item"
+              onClick={() =>
+                window.scrollTo({
+                  top:
+                    document.body.scrollHeight,
+                  behavior: "smooth",
+                })
+              }
             >
 
-              <div>
-                <strong>
-                  Preferências
-                </strong>
+              <div className="profile-setting-left">
 
-                <span>
-                  Personalize sua experiência
-                </span>
+                <div className="profile-setting-icon">
+                  <Sparkles
+                    size={16}
+                    strokeWidth={1.5}
+                  />
+                </div>
+
+                <div>
+
+                  <strong>
+                    Preferências
+                  </strong>
+
+                  <span>
+                    Personalize sua experiência
+                  </span>
+
+                </div>
+
               </div>
 
-              <ChevronRight size={16} />
+              <ChevronRight
+                size={16}
+                strokeWidth={1.5}
+              />
 
             </button>
 
@@ -432,17 +913,33 @@ function Perfil() {
               onClick={sair}
             >
 
-              <div>
-                <strong>
-                  Sair da conta
-                </strong>
+              <div className="profile-setting-left">
 
-                <span>
-                  Voltar para a tela de login
-                </span>
+                <div className="profile-setting-icon">
+                  <LogOut
+                    size={16}
+                    strokeWidth={1.5}
+                  />
+                </div>
+
+                <div>
+
+                  <strong>
+                    Sair da conta
+                  </strong>
+
+                  <span>
+                    Voltar para a tela de login
+                  </span>
+
+                </div>
+
               </div>
 
-              <ChevronRight size={16} />
+              <ChevronRight
+                size={16}
+                strokeWidth={1.5}
+              />
 
             </button>
 
