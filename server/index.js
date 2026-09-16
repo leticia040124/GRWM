@@ -10,7 +10,9 @@ import { fileURLToPath } from 'node:url'
 
 if(!process.env.DATABASE_URL) throw new Error('DATABASE_URL não configurada. Copie .env.example para .env e informe a conexão do Supabase.')
 pg.types.setTypeParser(1082,v=>v);pg.types.setTypeParser(1700,v=>Number(v))
-const pool=new pg.Pool({connectionString:process.env.DATABASE_URL,ssl:process.env.NODE_ENV==='test'?false:{rejectUnauthorized:false},max:10})
+const databaseConfig={connectionString:process.env.DATABASE_URL,ssl:process.env.NODE_ENV==='test'?false:{rejectUnauthorized:false}}
+const bootstrap=new pg.Client(databaseConfig);await bootstrap.connect();await bootstrap.query('CREATE SCHEMA IF NOT EXISTS grwm_app');await bootstrap.end()
+const pool=new pg.Pool({...databaseConfig,options:'-c search_path=grwm_app',max:10})
 const root=process.cwd()
 await pool.query(readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)),'schema.sql'),'utf8'))
 const app=express(),clean=v=>typeof v==='string'?v.trim():'',now=()=>new Date().toISOString(),fail=(res,c,m)=>res.status(c).json({error:m})

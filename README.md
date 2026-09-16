@@ -40,7 +40,7 @@ O servidor aplica `server/schema.sql` ao iniciar. Os comandos usam `CREATE TABLE
 
 ## Como conferir os dados salvos
 
-No painel do Supabase, abra **Table Editor**, selecione o esquema **public** e escolha uma tabela, como `users`, `items` ou `looks`. Também é possível conferir a conexão e os principais registros pelo terminal:
+No painel do Supabase, abra **Table Editor**, selecione o esquema **grwm_app** e escolha uma tabela, como `users`, `items` ou `looks`. Esse esquema separado evita conflitos com tabelas que já existiam no projeto. Também é possível conferir a conexão e os principais registros pelo terminal:
 
 ```powershell
 npm run db:inspect

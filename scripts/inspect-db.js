@@ -6,10 +6,10 @@ if (!process.env.DATABASE_URL) {
   process.exit(1)
 }
 
-const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false }, max: 1 })
+const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false }, options: '-c search_path=grwm_app', max: 1 })
 
 try {
-  const tables = await pool.query("SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename")
+  const tables = await pool.query("SELECT tablename FROM pg_tables WHERE schemaname = 'grwm_app' ORDER BY tablename")
   console.log('Conexão com o PostgreSQL/Supabase: OK\n')
   console.log('Tabelas e quantidades:')
   for (const { tablename } of tables.rows) {
