@@ -81,6 +81,6 @@ app.post('/api/feedback',auth,safe(async(req,res)=>{const id=randomUUID();await 
 app.get('/api/health',safe(async(_r,res)=>{await pool.query('SELECT 1');res.json({ok:true,database:'postgresql'})}))
 const dist=path.join(root,'dist');if(existsSync(dist)){app.use(express.static(dist));app.get(/^(?!\/api|\/uploads).*/,(_r,res)=>res.sendFile(path.join(dist,'index.html')))}
 app.use((e,_r,res,_n)=>{console.error(e);if(e.code==='23505'||e.code==='23503')return fail(res,409,'Registro em uso ou já existente.');fail(res,500,'Não foi possível concluir a operação.')})
-const port=Number(process.env.PORT)||3001,server=app.listen(port,'127.0.0.1',()=>console.log(`API GRWM em http://127.0.0.1:${port} · PostgreSQL`))
+const port=Number(process.env.PORT)||3001,host=process.env.HOST||'0.0.0.0',server=app.listen(port,host,()=>console.log(`API GRWM em http://${host}:${port} · PostgreSQL`))
 process.on('SIGINT',()=>server.close(()=>pool.end()));process.on('SIGTERM',()=>server.close(()=>pool.end()))
 
