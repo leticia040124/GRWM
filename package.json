@@ -8,14 +8,17 @@
     "build": "tsc -b && vite build --configLoader runner",
     "preview": "vite preview --configLoader runner",
     "start": "node server/index.js",
-    "test": "node --test tests/api.test.js"
+    "test": "node --test tests/api.test.js",
+    "db:inspect": "node scripts/inspect-db.js"
   },
   "dependencies": {
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "express": "^5.1.0",
     "multer": "^2.0.2",
-    "bcryptjs": "^3.0.2"
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^17.2.3",
+    "pg": "^8.16.3"
   },
   "devDependencies": {
     "@types/react": "^19.1.13",
