@@ -16,7 +16,8 @@ Node.js 24 ou superior e npm. O banco SQLite é criado automaticamente em `data/
 ## Instalação e execução
 
 ```powershell
-cd 'C:\Users\letic\Downloads\GRWM'
+git clone https://github.com/leticia040124/GRWM.git
+cd GRWM
 npm install
 npm run dev
 ```
