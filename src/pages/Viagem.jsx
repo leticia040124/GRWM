@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-
+import { Link } from "react-router-dom";
 import {
-  Home as HomeIcon,
+  Home,
   Shirt,
   Star,
   Heart,
@@ -12,100 +11,113 @@ import {
   Plus,
   MapPin,
   CalendarDays,
+  Luggage,
   ChevronRight,
   X,
 } from "lucide-react";
 
-import "../App.css";
+const viagensIniciais = [
+  {
+    id: 1,
+    destino: "Rio de Janeiro",
+    periodo: "12 — 16 OUT",
+    descricao: "Fim de semana na praia",
+    dias: 5,
+    looks: 3,
+    planejados: 3,
+    imagem:
+      "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?auto=format&fit=crop&w=1200&q=80",
+  },
+  {
+    id: 2,
+    destino: "São Paulo",
+    periodo: "03 — 07 NOV",
+    descricao: "Viagem de trabalho",
+    dias: 5,
+    looks: 2,
+    planejados: 1,
+    imagem:
+      "https://images.unsplash.com/photo-1543059080-f9b1272213d5?auto=format&fit=crop&w=1200&q=80",
+  },
+];
 
 function Viagem() {
-  const location = useLocation();
+  const [viagens, setViagens] = useState(viagensIniciais);
+  const [modalAberto, setModalAberto] = useState(false);
 
-  const [mostrarFormulario, setMostrarFormulario] = useState(false);
-
-  const [viagens, setViagens] = useState([
-    {
-      id: 1,
-      destino: "Rio de Janeiro",
-      data: "12 — 16 OUT",
-      descricao: "Fim de semana na praia",
-    },
-    {
-      id: 2,
-      destino: "São Paulo",
-      data: "03 — 07 NOV",
-      descricao: "Viagem de trabalho",
-    },
-  ]);
-
-  const [novaViagem, setNovaViagem] = useState({
+  const [form, setForm] = useState({
     destino: "",
-    data: "",
+    inicio: "",
+    fim: "",
     descricao: "",
   });
 
-  const menuAtivo = (rota) => {
-    return location.pathname === rota
-      ? "closet-nav-item active"
-      : "closet-nav-item";
+  const totalLooks = viagens.reduce(
+    (total, viagem) => total + viagem.looks,
+    0
+  );
+
+  const totalPlanejados = viagens.reduce(
+    (total, viagem) => total + viagem.planejados,
+    0
+  );
+
+  const abrirModal = () => {
+    setForm({
+      destino: "",
+      inicio: "",
+      fim: "",
+      descricao: "",
+    });
+
+    setModalAberto(true);
+  };
+
+  const fecharModal = () => {
+    setModalAberto(false);
   };
 
   const criarViagem = (event) => {
     event.preventDefault();
 
-    if (!novaViagem.destino.trim()) {
-      return;
-    }
+    if (!form.destino || !form.inicio || !form.fim) return;
 
-    const viagem = {
+    const novaViagem = {
       id: Date.now(),
-      destino: novaViagem.destino,
-      data: novaViagem.data || "A DEFINIR",
-      descricao:
-        novaViagem.descricao || "Nova viagem",
+      destino: form.destino,
+      periodo: `${form.inicio} — ${form.fim}`,
+      descricao: form.descricao || "Nova viagem",
+      dias: 5,
+      looks: 0,
+      planejados: 0,
+      imagem:
+        "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1200&q=80",
     };
 
-    setViagens((atual) => [...atual, viagem]);
-
-    setNovaViagem({
-      destino: "",
-      data: "",
-      descricao: "",
-    });
-
-    setMostrarFormulario(false);
+    setViagens((atual) => [...atual, novaViagem]);
+    fecharModal();
   };
 
   return (
     <div className="closet-page travel-page">
-
-      {/* SIDEBAR */}
       <aside className="closet-sidebar">
-
-        <Link to="/" className="closet-brand">
+        <Link to="/home" className="closet-brand">
           <span>SEU CLOSET</span>
           <h2>GRWM</h2>
         </Link>
 
         <nav className="closet-nav">
-
-          <Link to="/" className={menuAtivo("/")}>
-            <HomeIcon size={17} strokeWidth={1.6} />
+          <Link to="/home" className="closet-nav-item">
+            <Home size={17} strokeWidth={1.6} />
             <span>Início</span>
           </Link>
 
-          <Link
-            to="/closet"
-            className={menuAtivo("/closet")}
-          >
+          <Link to="/closet" className="closet-nav-item">
             <Shirt size={17} strokeWidth={1.6} />
             <span>Closet</span>
           </Link>
 
-          <Link
-            to="/looks"
-            className={menuAtivo("/looks")}
-          >
+          <Link to="/looks" className="closet-nav-item">
             <Star size={17} strokeWidth={1.6} />
             <span>Looks</span>
           </Link>
@@ -118,340 +130,290 @@ function Viagem() {
             <span>Viagem</span>
           </Link>
 
-          <Link
-            to="/favoritos"
-            className="closet-nav-item"
-          >
+          <Link to="/favoritos" className="closet-nav-item">
             <Heart size={17} strokeWidth={1.6} />
             <span>Favoritos</span>
           </Link>
 
-          <Link
-            to="/inspiracao"
-            className="closet-nav-item"
-          >
+          <Link to="/inspiracao" className="closet-nav-item">
             <Sparkles size={17} strokeWidth={1.6} />
             <span>Inspiração</span>
           </Link>
 
-          <Link
-            to="/perfil"
-            className={menuAtivo("/perfil")}
-          >
+          <Link to="/perfil" className="closet-nav-item">
             <UserRound size={17} strokeWidth={1.6} />
             <span>Perfil</span>
           </Link>
-
         </nav>
 
-        <div className="closet-motto">
-          sem limites.
+        <div className="closet-sidebar-footer">
+          <span>sem limites.</span>
         </div>
-
       </aside>
 
-
-      {/* CONTEÚDO */}
       <main className="closet-content travel-content">
-
         <header className="travel-header">
-
           <div>
-            <span className="home-eyebrow">
-              ORGANIZE SUAS AVENTURAS
+            <span className="travel-eyebrow">
+              PLANEJAMENTO
             </span>
 
-            <h1>
-              Viagem
-            </h1>
+            <h1>Viagens</h1>
 
             <p>
-              Planeje seus looks de acordo com cada destino.
+              Organize seus looks e planeje o que levar
+              para cada destino.
             </p>
           </div>
 
           <button
             type="button"
             className="travel-add-button"
-            onClick={() => setMostrarFormulario(true)}
+            onClick={abrirModal}
           >
-            <Plus size={15} />
+            <Plus size={16} strokeWidth={1.8} />
             Nova viagem
           </button>
-
         </header>
 
-
-        {/* RESUMO */}
         <section className="travel-summary">
-
           <div className="travel-summary-card">
-            <span>VIAGENS</span>
-            <strong>{viagens.length}</strong>
-            <p>planejadas</p>
-          </div>
+            <Plane size={18} strokeWidth={1.5} />
 
-          <div className="travel-summary-card">
-            <span>PRÓXIMA</span>
-            <strong>
-              {viagens.length > 0
-                ? viagens[0].destino
-                : "—"}
-            </strong>
-            <p>
-              {viagens.length > 0
-                ? viagens[0].data
-                : "Nenhuma viagem"}
-            </p>
-          </div>
-
-          <div className="travel-summary-note">
-            <Plane size={17} strokeWidth={1.3} />
             <div>
-              <span>SEU CLOSET, ONDE QUER QUE VOCÊ VÁ</span>
-              <p>
-                Crie uma viagem e depois escolha
-                os looks que quer levar.
-              </p>
+              <span>VIAGENS</span>
+              <strong>{viagens.length}</strong>
             </div>
           </div>
 
+          <div className="travel-summary-card">
+            <Luggage size={18} strokeWidth={1.5} />
+
+            <div>
+              <span>LOOKS PLANEJADOS</span>
+              <strong>{totalPlanejados}</strong>
+            </div>
+          </div>
+
+          <div className="travel-summary-card">
+            <Star size={18} strokeWidth={1.5} />
+
+            <div>
+              <span>LOOKS ORGANIZADOS</span>
+              <strong>{totalLooks}</strong>
+            </div>
+          </div>
         </section>
 
-
-        {/* LISTA */}
-        <section className="travel-section">
-
-          <div className="travel-section-heading">
-            <div>
-              <span>SEUS DESTINOS</span>
-              <h2>
-                Próximas viagens
-              </h2>
-            </div>
-
-            <span className="travel-section-count">
-              {viagens.length} {viagens.length === 1 ? "viagem" : "viagens"}
-            </span>
+        <div className="travel-section-heading">
+          <div>
+            <span>SEU PLANEJAMENTO</span>
+            <h2>Próximas viagens</h2>
           </div>
 
+          <small>
+            {viagens.length}{" "}
+            {viagens.length === 1 ? "viagem" : "viagens"}
+          </small>
+        </div>
 
-          {viagens.length > 0 ? (
+        <section className="travel-grid">
+          {viagens.map((viagem) => {
+            const progresso =
+              viagem.looks > 0
+                ? Math.round(
+                    (viagem.planejados / viagem.looks) * 100
+                  )
+                : 0;
 
-            <div className="travel-list">
+            return (
+              <article className="travel-card" key={viagem.id}>
+                <div className="travel-card-image">
+                  <img
+                    src={viagem.imagem}
+                    alt={viagem.destino}
+                  />
 
-              {viagens.map((viagem) => (
+                  <div className="travel-card-gradient" />
 
-                <article
-                  className="travel-card"
-                  key={viagem.id}
-                >
+                  <span className="travel-period">
+                    {viagem.periodo}
+                  </span>
 
-                  <div className="travel-card-icon">
+                  <div className="travel-destination">
                     <MapPin
-                      size={19}
-                      strokeWidth={1.3}
+                      size={14}
+                      strokeWidth={1.6}
                     />
+                    <span>{viagem.destino}</span>
+                  </div>
+                </div>
+
+                <div className="travel-card-content">
+                  <div className="travel-card-title">
+                    <div>
+                      <span>{viagem.dias} DIAS</span>
+                      <h3>{viagem.descricao}</h3>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="travel-arrow"
+                      aria-label={`Abrir viagem para ${viagem.destino}`}
+                    >
+                      <ChevronRight
+                        size={17}
+                        strokeWidth={1.5}
+                      />
+                    </button>
                   </div>
 
-                  <div className="travel-card-main">
-
+                  <div className="travel-meta">
                     <span>
-                      {viagem.data}
+                      <Shirt size={14} strokeWidth={1.5} />
+                      {viagem.looks} looks
                     </span>
 
-                    <h3>
-                      {viagem.destino}
-                    </h3>
+                    <span>
+                      <CalendarDays
+                        size={14}
+                        strokeWidth={1.5}
+                      />
+                      {viagem.planejados} planejados
+                    </span>
+                  </div>
 
-                    <p>
-                      {viagem.descricao}
-                    </p>
+                  <div className="travel-progress">
+                    <div>
+                      <span>Planejamento</span>
+                      <strong>{progresso}%</strong>
+                    </div>
 
+                    <div className="travel-progress-track">
+                      <span
+                        style={{
+                          width: `${progresso}%`,
+                        }}
+                      />
+                    </div>
                   </div>
 
                   <button
                     type="button"
-                    className="travel-card-action"
-                    aria-label={`Abrir viagem para ${viagem.destino}`}
+                    className="travel-plan-button"
                   >
-                    <ChevronRight size={17} />
+                    <Luggage
+                      size={14}
+                      strokeWidth={1.6}
+                    />
+                    Planejar looks
                   </button>
-
-                </article>
-
-              ))}
-
-            </div>
-
-          ) : (
-
-            <div className="travel-empty">
-
-              <div className="travel-empty-icon">
-                <Plane
-                  size={21}
-                  strokeWidth={1.3}
-                />
-              </div>
-
-              <span>
-                SUAS VIAGENS
-              </span>
-
-              <h2>
-                Nenhuma viagem planejada.
-              </h2>
-
-              <p>
-                Crie sua primeira viagem para
-                começar a montar seus looks.
-              </p>
-
-              <button
-                type="button"
-                className="travel-empty-button"
-                onClick={() => setMostrarFormulario(true)}
-              >
-                Criar viagem
-                <Plus size={13} />
-              </button>
-
-            </div>
-
-          )}
-
+                </div>
+              </article>
+            );
+          })}
         </section>
+      </main>
 
-
-        {/* FORMULÁRIO */}
-        {mostrarFormulario && (
-
+      {modalAberto && (
+        <div
+          className="travel-modal-overlay"
+          onClick={fecharModal}
+        >
           <div
-            className="travel-modal-overlay"
-            onMouseDown={(event) => {
-              if (
-                event.target === event.currentTarget
-              ) {
-                setMostrarFormulario(false);
-              }
-            }}
+            className="travel-modal"
+            onClick={(event) =>
+              event.stopPropagation()
+            }
           >
+            <button
+              type="button"
+              className="travel-modal-close"
+              onClick={fecharModal}
+              aria-label="Fechar"
+            >
+              <X size={17} strokeWidth={1.5} />
+            </button>
 
-            <div className="travel-modal">
+            <span className="travel-eyebrow">
+              NOVA VIAGEM
+            </span>
 
-              <button
-                type="button"
-                className="travel-modal-close"
-                onClick={() => setMostrarFormulario(false)}
-                aria-label="Fechar"
-              >
-                <X size={17} />
-              </button>
+            <h2>Planeje seu próximo destino.</h2>
 
-              <div className="travel-modal-heading">
-                <span>NOVA VIAGEM</span>
-                <h2>
-                  Para onde vamos?
-                </h2>
-                <p>
-                  Cadastre seu destino para organizar
-                  os looks que você quer levar.
-                </p>
-              </div>
+            <form onSubmit={criarViagem}>
+              <label>
+                Destino
+                <input
+                  type="text"
+                  placeholder="Ex.: Salvador"
+                  value={form.destino}
+                  onChange={(event) =>
+                    setForm({
+                      ...form,
+                      destino: event.target.value,
+                    })
+                  }
+                />
+              </label>
 
-              <form
-                className="travel-form"
-                onSubmit={criarViagem}
-              >
-
-                <div className="travel-field">
-                  <label htmlFor="destino">
-                    Destino
-                  </label>
-
-                  <div className="travel-input-wrapper">
-                    <MapPin size={14} />
-
-                    <input
-                      id="destino"
-                      type="text"
-                      placeholder="Ex.: Rio de Janeiro"
-                      value={novaViagem.destino}
-                      onChange={(event) =>
-                        setNovaViagem({
-                          ...novaViagem,
-                          destino: event.target.value,
-                        })
-                      }
-                      required
-                    />
-                  </div>
-                </div>
-
-
-                <div className="travel-field">
-                  <label htmlFor="data">
-                    Data
-                  </label>
-
-                  <div className="travel-input-wrapper">
-                    <CalendarDays size={14} />
-
-                    <input
-                      id="data"
-                      type="text"
-                      placeholder="Ex.: 12 — 16 OUT"
-                      value={novaViagem.data}
-                      onChange={(event) =>
-                        setNovaViagem({
-                          ...novaViagem,
-                          data: event.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                </div>
-
-
-                <div className="travel-field">
-                  <label htmlFor="descricao">
-                    Descrição
-                  </label>
-
+              <div className="travel-form-row">
+                <label>
+                  Ida
                   <input
-                    id="descricao"
                     type="text"
-                    placeholder="Ex.: Fim de semana na praia"
-                    value={novaViagem.descricao}
+                    placeholder="12 OUT"
+                    value={form.inicio}
                     onChange={(event) =>
-                      setNovaViagem({
-                        ...novaViagem,
-                        descricao: event.target.value,
+                      setForm({
+                        ...form,
+                        inicio: event.target.value,
                       })
                     }
                   />
-                </div>
+                </label>
 
+                <label>
+                  Volta
+                  <input
+                    type="text"
+                    placeholder="16 OUT"
+                    value={form.fim}
+                    onChange={(event) =>
+                      setForm({
+                        ...form,
+                        fim: event.target.value,
+                      })
+                    }
+                  />
+                </label>
+              </div>
 
-                <button
-                  type="submit"
-                  className="travel-form-submit"
-                >
-                  Criar viagem
-                  <ArrowRight size={14} />
-                </button>
+              <label>
+                Descrição
+                <input
+                  type="text"
+                  placeholder="Ex.: Fim de semana na praia"
+                  value={form.descricao}
+                  onChange={(event) =>
+                    setForm({
+                      ...form,
+                      descricao: event.target.value,
+                    })
+                  }
+                />
+              </label>
 
-              </form>
-
-            </div>
-
+              <button
+                type="submit"
+                className="travel-form-submit"
+              >
+                Criar viagem
+              </button>
+            </form>
           </div>
-
-        )}
-
-      </main>
-
+        </div>
+      )}
     </div>
   );
 }

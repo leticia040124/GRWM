@@ -14,65 +14,6 @@ import {
   Check,
 } from "lucide-react";
 
-const pecasBase = [
-  {
-    id: 1,
-    nome: "Camiseta branca",
-    categoria: "Blusas",
-    imagem:
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=700&q=80",
-  },
-  {
-    id: 2,
-    nome: "Blazer preto",
-    categoria: "Casacos",
-    imagem:
-      "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=700&q=80",
-  },
-  {
-    id: 3,
-    nome: "Jeans reto",
-    categoria: "Calças",
-    imagem:
-      "https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=700&q=80",
-  },
-  {
-    id: 4,
-    nome: "Calça preta",
-    categoria: "Calças",
-    imagem:
-      "https://images.unsplash.com/photo-1506629905607-d9c297d5d6a1?auto=format&fit=crop&w=700&q=80",
-  },
-  {
-    id: 5,
-    nome: "Tênis branco",
-    categoria: "Calçados",
-    imagem:
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=700&q=80",
-  },
-  {
-    id: 6,
-    nome: "Camisa branca",
-    categoria: "Blusas",
-    imagem:
-      "https://images.unsplash.com/photo-1603252110481-7ba873bf42ab?auto=format&fit=crop&w=700&q=80",
-  },
-  {
-    id: 7,
-    nome: "Bota preta",
-    categoria: "Calçados",
-    imagem:
-      "https://images.unsplash.com/photo-1608256246200-53e635b5b65f?auto=format&fit=crop&w=700&q=80",
-  },
-  {
-    id: 8,
-    nome: "Blusa bege",
-    categoria: "Blusas",
-    imagem:
-      "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=700&q=80",
-  },
-];
-
 function ResultadoLook() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -86,13 +27,141 @@ function ResultadoLook() {
     cor = "Neutras",
     pecasUsar = [],
     pecasEvitar = [],
+    pecas = [],
   } = preferencias;
 
-  /*
-    Por enquanto, a montagem é simulada no front.
-    Quando entrarmos na parte de IA/backend,
-    essa lógica será substituída pela recomendação real.
-  */
+  // --------------------------------------------------
+  // NORMALIZAÇÃO
+  // --------------------------------------------------
+
+  const normalizar = (valor) => {
+    if (!valor) return "";
+
+    return valor
+      .toString()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim();
+  };
+
+  // --------------------------------------------------
+  // CORES
+  // --------------------------------------------------
+
+  const coresEscuras = [
+    "preto",
+    "preta",
+    "azul marinho",
+    "marinho",
+    "cinza escuro",
+    "cinza",
+    "vinho",
+    "bordo",
+    "marrom",
+    "verde escuro",
+  ];
+
+  const coresClaras = [
+    "branco",
+    "branca",
+    "bege",
+    "creme",
+    "off white",
+    "off-white",
+    "rosa claro",
+    "azul claro",
+    "verde claro",
+    "amarelo",
+  ];
+
+  const coresNeutras = [
+    "preto",
+    "preta",
+    "branco",
+    "branca",
+    "cinza",
+    "bege",
+    "creme",
+    "off white",
+    "off-white",
+    "marrom",
+  ];
+
+  const corCombina = (corPeca, corPreferida) => {
+    const peca = normalizar(corPeca);
+    const preferida = normalizar(corPreferida);
+
+    if (!peca || !preferida) {
+      return false;
+    }
+
+    // Cor específica
+    if (peca === preferida) {
+      return true;
+    }
+
+    // Grupo de cores escuras
+    if (preferida === "escuras") {
+      return coresEscuras.includes(peca);
+    }
+
+    // Grupo de cores claras
+    if (preferida === "claras") {
+      return coresClaras.includes(peca);
+    }
+
+    // Grupo de cores neutras
+    if (preferida === "neutras") {
+      return coresNeutras.includes(peca);
+    }
+
+    return false;
+  };
+
+
+  const coresCombinam = (cor1, cor2) => {
+  const primeira = normalizar(cor1);
+  const segunda = normalizar(cor2);
+
+  if (!primeira || !segunda) {
+    return false;
+  }
+
+  // Mesma cor
+  if (primeira === segunda) {
+    return true;
+  }
+
+  // Cores neutras combinam entre si
+  if (
+    coresNeutras.includes(primeira) &&
+    coresNeutras.includes(segunda)
+  ) {
+    return true;
+  }
+
+  // Preto combina com praticamente tudo
+  if (
+    ["preto", "preta"].includes(primeira) ||
+    ["preto", "preta"].includes(segunda)
+  ) {
+    return true;
+  }
+
+  // Branco combina com praticamente tudo
+  if (
+    ["branco", "branca"].includes(primeira) ||
+    ["branco", "branca"].includes(segunda)
+  ) {
+    return true;
+  }
+
+  return false;
+};
+  // --------------------------------------------------
+  // PEÇAS OBRIGATÓRIAS
+  // --------------------------------------------------
 
   const pecasObrigatorias = pecasUsar.filter(
     (peca) =>
@@ -101,7 +170,11 @@ function ResultadoLook() {
       )
   );
 
-  const pecasDisponiveis = pecasBase.filter(
+  // --------------------------------------------------
+  // PEÇAS DISPONÍVEIS
+  // --------------------------------------------------
+
+  const pecasDisponiveis = pecas.filter(
     (peca) =>
       !pecasEvitar.some(
         (evitar) => evitar.id === peca.id
@@ -111,37 +184,159 @@ function ResultadoLook() {
       )
   );
 
+  // --------------------------------------------------
+  // PONTUAÇÃO
+  // --------------------------------------------------
+
+  const pontuarPeca = (peca) => {
+    let pontos = 0;
+
+    // Peça escolhida pelo usuário
+    if (
+      pecasUsar.some(
+        (item) => item.id === peca.id
+      )
+    ) {
+      pontos += 1000;
+    }
+
+    // Ocasião
+    if (
+      Array.isArray(peca.occasion) &&
+      peca.occasion.some(
+        (item) =>
+          normalizar(item) === normalizar(ocasiao)
+      )
+    ) {
+      pontos += 30;
+    }
+
+    // Clima
+    if (
+      peca.temperature &&
+      normalizar(peca.temperature) ===
+        normalizar(clima)
+    ) {
+      pontos += 20;
+    }
+
+    // Estilo
+    if (
+      peca.style &&
+      normalizar(peca.style) ===
+        normalizar(estilo)
+    ) {
+      pontos += 20;
+    }
+
+    // Cor
+    if (
+      peca.color &&
+      corCombina(peca.color, cor)
+    ) {
+      pontos += 10;
+    }
+
+    return pontos;
+  };
+
+  // --------------------------------------------------
+  // ORDENAÇÃO
+  // --------------------------------------------------
+
+  const pecasOrdenadas = [...pecasDisponiveis].sort(
+    (a, b) => pontuarPeca(b) - pontuarPeca(a)
+  );
+
+  // --------------------------------------------------
+  // CATEGORIAS DO LOOK
+  // --------------------------------------------------
+
   const categoriasNecessarias = [
-    "Blusas",
-    "Calças",
-    "Calçados",
+    {
+      nome: "parte de cima",
+      categorias: [
+        "camiseta",
+        "camisa",
+        "blusa",
+        "regata",
+        "cropped",
+      ],
+    },
+    {
+      nome: "parte de baixo",
+      categorias: [
+        "calça",
+        "calca",
+        "shorts",
+        "short",
+        "saia",
+      ],
+    },
+    {
+      nome: "calçado",
+      categorias: [
+        "tênis",
+        "tenis",
+        "sapato",
+        "sandália",
+        "sandalia",
+        "bota",
+        "chinelo",
+      ],
+    },
   ];
 
-  const pecasSugeridas = categoriasNecessarias.map(
-    (categoria) => {
+  // --------------------------------------------------
+  // PEÇAS SUGERIDAS
+  // --------------------------------------------------
+
+  const pecasSugeridas = categoriasNecessarias
+    .map((grupo) => {
+      // Primeiro procura uma peça obrigatória
       const obrigatoria = pecasObrigatorias.find(
-        (peca) => peca.categoria === categoria
+        (peca) =>
+          grupo.categorias.includes(
+            normalizar(peca.category)
+          )
       );
 
       if (obrigatoria) {
         return obrigatoria;
       }
 
-      return pecasDisponiveis.find(
-        (peca) => peca.categoria === categoria
+      // Se não houver, pega a melhor peça disponível
+      const melhorPeca = pecasOrdenadas.find(
+        (peca) =>
+          grupo.categorias.includes(
+            normalizar(peca.category)
+          )
       );
-    }
-  ).filter(Boolean);
+
+      return melhorPeca;
+    })
+    .filter(Boolean);
+
+  // --------------------------------------------------
+  // LOOK FINAL
+  // --------------------------------------------------
+
+  const idsJaSelecionados = new Set(
+    pecasObrigatorias.map((peca) => peca.id)
+  );
+
+  const sugestoesNovas = pecasSugeridas.filter(
+    (peca) => !idsJaSelecionados.has(peca.id)
+  );
 
   const lookFinal = [
     ...pecasObrigatorias,
-    ...pecasSugeridas.filter(
-      (peca) =>
-        !pecasObrigatorias.some(
-          (obrigatoria) => obrigatoria.id === peca.id
-        )
-    ),
-  ].slice(0, 5);
+    ...sugestoesNovas,
+  ];
+
+  // --------------------------------------------------
+  // AÇÕES
+  // --------------------------------------------------
 
   const salvarLook = () => {
     alert("Look salvo com sucesso!");
@@ -160,7 +355,7 @@ function ResultadoLook() {
       {/* SIDEBAR */}
       <aside className="closet-sidebar">
 
-        <Link to="/" className="closet-brand">
+        <Link to="/home" className="closet-brand">
           <span>SEU CLOSET</span>
           <h2>GRWM</h2>
         </Link>
@@ -168,8 +363,8 @@ function ResultadoLook() {
         <nav className="closet-nav">
 
           <Link
-            to="/"
-            className={`closet-nav-item ${menuAtivo("/")}`}
+            to="/home"
+            className={`closet-nav-item ${menuAtivo("/home")}`}
           >
             <Home size={17} strokeWidth={1.6} />
             <span>Início</span>
@@ -336,12 +531,12 @@ function ResultadoLook() {
                 <div className="result-look-piece-image">
 
                   <img
-                    src={peca.imagem}
-                    alt={peca.nome}
+                    src={peca.image_url}
+                    alt={peca.name}
                   />
 
                   <div className="result-look-piece-number">
-                    0{index + 1}
+                    {String(index + 1).padStart(2, "0")}
                   </div>
 
                 </div>
@@ -349,18 +544,20 @@ function ResultadoLook() {
                 <div className="result-look-piece-info">
 
                   <div>
+
                     <strong>
-                      {peca.nome}
+                      {peca.name}
                     </strong>
 
                     <span>
-                      {peca.categoria}
+                      {peca.category}
                     </span>
+
                   </div>
 
                   <button
                     type="button"
-                    aria-label={`Favoritar ${peca.nome}`}
+                    aria-label={`Favoritar ${peca.name}`}
                   >
                     <HeartIcon
                       size={15}

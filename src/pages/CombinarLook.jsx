@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "../lib/supabase";
 import {
   Home,
   Shirt,
@@ -18,64 +19,9 @@ import {
   Plus,
 } from "lucide-react";
 
-const pecas = [
-  {
-    id: 1,
-    nome: "Camiseta branca",
-    categoria: "Blusas",
-    imagem:
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=500&q=80",
-  },
-  {
-    id: 2,
-    nome: "Blazer preto",
-    categoria: "Casacos",
-    imagem:
-      "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=500&q=80",
-  },
-  {
-    id: 3,
-    nome: "Jeans reto",
-    categoria: "Calças",
-    imagem:
-      "https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=500&q=80",
-  },
-  {
-    id: 4,
-    nome: "Calça preta",
-    categoria: "Calças",
-    imagem:
-      "https://images.unsplash.com/photo-1506629905607-d9c297d5d6a1?auto=format&fit=crop&w=500&q=80",
-  },
-  {
-    id: 5,
-    nome: "Tênis branco",
-    categoria: "Calçados",
-    imagem:
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=500&q=80",
-  },
-  {
-    id: 6,
-    nome: "Camisa branca",
-    categoria: "Blusas",
-    imagem:
-      "https://images.unsplash.com/photo-1603252110481-7ba873bf42ab?auto=format&fit=crop&w=500&q=80",
-  },
-  {
-    id: 7,
-    nome: "Bota preta",
-    categoria: "Calçados",
-    imagem:
-      "https://images.unsplash.com/photo-1608256246200-53e635b5b65f?auto=format&fit=crop&w=500&q=80",
-  },
-  {
-    id: 8,
-    nome: "Blusa bege",
-    categoria: "Blusas",
-    imagem:
-      "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=500&q=80",
-  },
-];
+import { buscarMinhasPecas } from "../service/roupasService";
+
+
 
 const filtros = {
   ocasiao: [
@@ -113,6 +59,36 @@ function CombinarLook() {
 
   const [pecasUsar, setPecasUsar] = useState([]);
   const [pecasEvitar, setPecasEvitar] = useState([]);
+  const [pecas, setPecas] = useState([]);
+
+  useEffect(() => {
+    async function iniciarTeste() {
+      try {
+        const { data: loginData, error: loginError } =
+          await supabase.auth.signInWithPassword({
+            email: "biribinha@gmail.com",
+            password: "123",
+          });
+
+        if (loginError) {
+          throw loginError;
+        }
+
+        console.log("Usuário de teste logado:", loginData.user);
+
+        const roupas = await buscarMinhasPecas();
+
+        console.log("Peças carregadas:", roupas);
+
+        setPecas(roupas);
+      } catch (error) {
+        console.error("Erro no teste:", error);
+      }
+    }
+
+    iniciarTeste();
+  }, []);
+
 
   const [modalPecas, setModalPecas] = useState(null);
   const [busca, setBusca] = useState("");
@@ -158,6 +134,7 @@ function CombinarLook() {
         cor,
         pecasUsar,
         pecasEvitar,
+        pecas,
       },
     });
   };
@@ -165,97 +142,105 @@ function CombinarLook() {
   const menuAtivo = (rota) =>
     window.location.pathname === rota ? "active" : "";
 
-  const pecasFiltradas = pecas.filter((peca) =>
-    `${peca.nome} ${peca.categoria}`
-      .toLowerCase()
-      .includes(busca.toLowerCase())
-  );
+  const pecasFiltradas = pecas.filter((peca) => {
+    const correspondeBusca =
+      `${peca.name} ${peca.category}`
+        .toLowerCase()
+        .includes(busca.toLowerCase());
+
+    const estaEmOutraLista =
+      modalPecas === "usar"
+        ? pecasEvitar.some((item) => item.id === peca.id)
+        : pecasUsar.some((item) => item.id === peca.id);
+
+    return correspondeBusca && !estaEmOutraLista;
+  });
 
   return (
     <div className="closet-page">
 
       {/* SIDEBAR PADRÃO */}
       {/* SIDEBAR */}
-<aside className="closet-sidebar">
+      <aside className="closet-sidebar">
 
-  <Link to="/" className="closet-brand">
-    <span>SEU CLOSET</span>
-    <h2>GRWM</h2>
-  </Link>
+        <Link to="/home" className="closet-brand">
+          <span>SEU CLOSET</span>
+          <h2>GRWM</h2>
+        </Link>
 
-  <nav className="closet-nav">
+        <nav className="closet-nav">
 
-    <Link
-      to="/"
-      className={menuAtivo("/") === "active"
-        ? "closet-nav-item active"
-        : "closet-nav-item"}
-    >
-      <Home size={17} strokeWidth={1.6} />
-      <span>Início</span>
-    </Link>
+          <Link
+            to="/home"
+            className={menuAtivo("/home") === "active"
+              ? "closet-nav-item active"
+              : "closet-nav-item"}
+          >
+            <Home size={17} strokeWidth={1.6} />
+            <span>Início</span>
+          </Link>
 
-    <Link
-      to="/closet"
-      className={menuAtivo("/closet") === "active"
-        ? "closet-nav-item active"
-        : "closet-nav-item"}
-    >
-      <Shirt size={17} strokeWidth={1.6} />
-      <span>Closet</span>
-    </Link>
+          <Link
+            to="/closet"
+            className={menuAtivo("/closet") === "active"
+              ? "closet-nav-item active"
+              : "closet-nav-item"}
+          >
+            <Shirt size={17} strokeWidth={1.6} />
+            <span>Closet</span>
+          </Link>
 
-    <Link
-      to="/looks"
-      className={menuAtivo("/looks") === "active"
-        ? "closet-nav-item active"
-        : "closet-nav-item"}
-    >
-      <Star size={17} strokeWidth={1.6} />
-      <span>Looks</span>
-    </Link>
+          <Link
+            to="/looks"
+            className={menuAtivo("/looks") === "active"
+              ? "closet-nav-item active"
+              : "closet-nav-item"}
+          >
+            <Star size={17} strokeWidth={1.6} />
+            <span>Looks</span>
+          </Link>
 
-    <Link
-      to="/viagem"
-      className="closet-nav-item"
-    >
-      <Plane size={17} strokeWidth={1.6} />
-      <span>Viagem</span>
-    </Link>
+          <Link
+            to="/viagem"
+            className="closet-nav-item"
+          >
+            <Plane size={17} strokeWidth={1.6} />
+            <span>Viagem</span>
+          </Link>
 
-    <Link
-      to="/favoritos"
-      className="closet-nav-item"
-    >
-      <Heart size={17} strokeWidth={1.6} />
-      <span>Favoritos</span>
-    </Link>
+          <Link
+            to="/favoritos"
+            className="closet-nav-item"
+          >
+            <Heart size={17} strokeWidth={1.6} />
+            <span>Favoritos</span>
+          </Link>
 
-    <Link
-      to="/inspiracao"
-      className="closet-nav-item"
-    >
-      <Sparkles size={17} strokeWidth={1.6} />
-      <span>Inspiração</span>
-    </Link>
+          <Link
+            to="/inspiracao"
+            className="closet-nav-item"
+          >
+            <Sparkles size={17} strokeWidth={1.6} />
+            <span>Inspiração</span>
+          </Link>
 
-    <Link
-      to="/perfil"
-      className={menuAtivo("/perfil") === "active"
-        ? "closet-nav-item active"
-        : "closet-nav-item"}
-    >
-      <UserRound size={17} strokeWidth={1.6} />
-      <span>Perfil</span>
-    </Link>
+          <Link
+            to="/perfil"
+            className={menuAtivo("/perfil") === "active"
+              ? "closet-nav-item active"
+              : "closet-nav-item"}
+          >
+            <UserRound size={17} strokeWidth={1.6} />
+            <span>Perfil</span>
+          </Link>
 
-  </nav>
+        </nav>
 
-  <div className="closet-motto">
-    sem limites.
-  </div>
+        <div className="closet-motto">
+          sem limites.
+        </div>
 
-</aside>
+      </aside>
       {/* CONTEÚDO */}
       <main className="closet-content combine-page">
 
@@ -316,9 +301,8 @@ function CombinarLook() {
               <button
                 key={item}
                 type="button"
-                className={`combine-option ${
-                  ocasiao === item ? "selected" : ""
-                }`}
+                className={`combine-option ${ocasiao === item ? "selected" : ""
+                  }`}
                 onClick={() => setOcasiao(item)}
               >
 
@@ -357,9 +341,8 @@ function CombinarLook() {
 
             <button
               type="button"
-              className={`combine-option climate-option ${
-                clima === "Quente" ? "selected" : ""
-              }`}
+              className={`combine-option climate-option ${clima === "Quente" ? "selected" : ""
+                }`}
               onClick={() => setClima("Quente")}
             >
               <Sun size={16} />
@@ -368,9 +351,8 @@ function CombinarLook() {
 
             <button
               type="button"
-              className={`combine-option climate-option ${
-                clima === "Ameno" ? "selected" : ""
-              }`}
+              className={`combine-option climate-option ${clima === "Ameno" ? "selected" : ""
+                }`}
               onClick={() => setClima("Ameno")}
             >
               <CloudSun size={16} />
@@ -379,9 +361,8 @@ function CombinarLook() {
 
             <button
               type="button"
-              className={`combine-option climate-option ${
-                clima === "Frio" ? "selected" : ""
-              }`}
+              className={`combine-option climate-option ${clima === "Frio" ? "selected" : ""
+                }`}
               onClick={() => setClima("Frio")}
             >
               <Snowflake size={16} />
@@ -416,9 +397,8 @@ function CombinarLook() {
               <button
                 key={item}
                 type="button"
-                className={`combine-option ${
-                  estilo === item ? "selected" : ""
-                }`}
+                className={`combine-option ${estilo === item ? "selected" : ""
+                  }`}
                 onClick={() => setEstilo(item)}
               >
 
@@ -460,9 +440,8 @@ function CombinarLook() {
               <button
                 key={item}
                 type="button"
-                className={`combine-option ${
-                  cor === item ? "selected" : ""
-                }`}
+                className={`combine-option ${cor === item ? "selected" : ""
+                  }`}
                 onClick={() => setCor(item)}
               >
 
@@ -507,13 +486,13 @@ function CombinarLook() {
               >
 
                 <img
-                  src={peca.imagem}
-                  alt={peca.nome}
+                  src={peca.image_url}
+                  alt={peca.name}
                 />
 
                 <div>
-                  <strong>{peca.nome}</strong>
-                  <span>{peca.categoria}</span>
+                  <strong>{peca.name}</strong>
+                  <span>{peca.category}</span>
                 </div>
 
                 <button
@@ -572,13 +551,13 @@ function CombinarLook() {
               >
 
                 <img
-                  src={peca.imagem}
-                  alt={peca.nome}
+                  src={peca.image_url}
+                  alt={peca.name}
                 />
 
                 <div>
-                  <strong>{peca.nome}</strong>
-                  <span>{peca.categoria}</span>
+                  <strong>{peca.name}</strong>
+                  <span>{peca.category}</span>
                 </div>
 
                 <button
@@ -694,19 +673,18 @@ function CombinarLook() {
                 const selecionada =
                   modalPecas === "usar"
                     ? pecasUsar.some(
-                        (item) => item.id === peca.id
-                      )
+                      (item) => item.id === peca.id
+                    )
                     : pecasEvitar.some(
-                        (item) => item.id === peca.id
-                      );
+                      (item) => item.id === peca.id
+                    );
 
                 return (
 
                   <button
                     type="button"
-                    className={`piece-picker-card ${
-                      selecionada ? "selected" : ""
-                    }`}
+                    className={`piece-picker-card ${selecionada ? "selected" : ""
+                      }`}
                     key={peca.id}
                     onClick={() =>
                       selecionarPeca(peca)
@@ -716,8 +694,8 @@ function CombinarLook() {
                     <div className="piece-picker-image">
 
                       <img
-                        src={peca.imagem}
-                        alt={peca.nome}
+                        src={peca.image_url}
+                        alt={peca.name}
                       />
 
                       {selecionada && (
@@ -729,8 +707,8 @@ function CombinarLook() {
                     </div>
 
                     <div className="piece-picker-info">
-                      <strong>{peca.nome}</strong>
-                      <span>{peca.categoria}</span>
+                      <strong>{peca.name}</strong>
+                      <span>{peca.category}</span>
                     </div>
 
                   </button>

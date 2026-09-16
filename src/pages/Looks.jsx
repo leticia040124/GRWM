@@ -117,7 +117,7 @@ function Looks() {
      {/* SIDEBAR */}
 <aside className="closet-sidebar">
 
-  <Link to="/" className="closet-brand">
+  <Link to="/home" className="closet-brand">
     <span>SEU CLOSET</span>
     <h2>GRWM</h2>
   </Link>
@@ -125,8 +125,8 @@ function Looks() {
   <nav className="closet-nav">
 
     <Link
-      to="/"
-      className={`closet-nav-item ${menuAtivo("/")}`}
+      to="/home"
+      className={`closet-nav-item ${menuAtivo("/home ")}`}
     >
       <HomeIcon size={17} strokeWidth={1.6} />
       <span>Início</span>
